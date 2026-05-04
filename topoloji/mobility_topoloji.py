@@ -1,4 +1,5 @@
 from math import sqrt
+import os
 
 from mininet.node import RemoteController, OVSKernelSwitch
 from mininet.log import setLogLevel, info
@@ -131,16 +132,34 @@ def topology():
         range=60
     )
 
+    info("*** Backbone Switch (s1) ekleniyor\n")
+    s1 = net.addSwitch('s1')
+    ap1 = net.get('ap1')
+    net.addLink(ap1, s1)
+
     info("*** Propagation model ayarlaniyor\n")
     net.setPropagationModel(model="logDistance", exp=3)
 
     info("*** WiFi dugumleri yapilandiriliyor\n")
     net.configureWifiNodes()
 
+    info("*** Gorsellestirme (PlotGraph) Aciliyor\n")
+    net.plotGraph(max_x=100, max_y=100)
+
     info("*** Ag baslatiliyor\n")
     net.build()
     c0.start()
     net.get('ap1').start([c0])
+    s1.start([c0])
+
+    info("*** VXLAN Tunelleri olusturuluyor\n")
+    # Underlay IP adresleri (ap1-eth1 ve s1-eth1 uzerinden)
+    net.get('ap1').cmd('ip addr add 192.168.10.1/24 dev ap1-eth1')
+    s1.cmd('ip addr add 192.168.10.2/24 dev s1-eth1')
+    
+    # OVS uzerinde VXLAN portlarinin yaratilmasi (VNI=100)
+    net.get('ap1').cmd('ovs-vsctl add-port ap1 vxlan1 -- set interface vxlan1 type=vxlan options:remote_ip=192.168.10.2 options:key=100')
+    s1.cmd('ovs-vsctl add-port s1 vxlan1 -- set interface vxlan1 type=vxlan options:remote_ip=192.168.10.1 options:key=100')
 
     uav1 = net.get('uav1')
     uav2 = net.get('uav2')
@@ -179,4 +198,5 @@ def topology():
 
 if __name__ == '__main__':
     setLogLevel('info')
+    os.system('mn -c > /dev/null 2>&1')
     topology()

@@ -1,0 +1,5 @@
+Scenario,Avg_RTT_ms,Packet_Loss_%,Bandwidth_Mbps
+SDN-2UAV,113.191,0,15.6
+SDN-4UAV,111.237,0,16.6
+SDN-6UAV,315.540,0,16.4
+OLSR-Baseline-2UAV,174.7865,2.0,10.92
