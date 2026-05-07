@@ -166,22 +166,15 @@ def topology():
     ugv1 = net.get('ugv1')
     ugv2 = net.get('ugv2')
 
-    info("*** Mobilite baslatiliyor\n")
-    net.startMobility(time=0)
-
-    net.mobility(uav1, 'start', time=1, position='20,25,0')
-    net.mobility(uav1, 'stop',  time=20, position='35,40,0')
-
-    net.mobility(uav2, 'start', time=1, position='25,35,0')
-    net.mobility(uav2, 'stop',  time=20, position='40,25,0')
-
-    net.mobility(ugv1, 'start', time=2, position='35,25,0')
-    net.mobility(ugv1, 'stop',  time=20, position='25,40,0')
-
-    net.mobility(ugv2, 'start', time=2, position='40,35,0')
-    net.mobility(ugv2, 'stop',  time=20, position='45,30,0')
-
-    net.stopMobility(time=21)
+    info("*** Mobilite baslatiliyor (FANET icin Gercekci Gauss-Markov Modeli)\n")
+    # FANET (UAV) projeleri icin en gercekci model olan Gauss-Markov kullanilmistir.
+    # Dronlarin aniden yon degistirmesi fiziksel olarak mumkun olmadigindan, 
+    # GaussMarkov modeli dronlarin eski hiz ve yonlerini hesaba katarak gercekci 
+    # bir ucus dinamigi saglar.
+    net.setMobilityModel(time=0, model='GaussMarkov', max_x=100, max_y=100, min_v=5.0, max_v=15.0, seed=20)
+    
+    # 30 saniye boyunca hareket simüle edilsin
+    net.stopMobility(time=30)
 
     info("*** Dinamik cluster bilgisi yazdiriliyor\n")
     print_clusters(net)

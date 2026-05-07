@@ -21,13 +21,15 @@ class TezController(app_manager.RyuApp):
 
         # UGV listesi
         self.ugv_nodes = ["ugv1", "ugv2"]
-        self.uav_nodes = [f"uav{i}" for i in range(1, 7)]
+        self.uav_nodes = ["uav1", "uav2"]
 
         # Topoloji konumları ve diğer değişkenleri dinamik ilklendir
         self.positions = {
             "ap1":  (30.0, 30.0, 0.0),
             "ugv1": (35.0, 25.0, 0.0),
             "ugv2": (40.0, 35.0, 0.0),
+            "uav1": (20.0, 25.0, 0.0),
+            "uav2": (25.0, 35.0, 0.0),
         }
         self.max_link_distance = {}
         self.uav_status = {}
@@ -36,9 +38,8 @@ class TezController(app_manager.RyuApp):
         self.packet_count = {}
 
         for uav in self.uav_nodes:
-            self.positions[uav] = (999.0, 999.0, 0.0) # Uzakta başlat
             self.max_link_distance[uav] = 60.0
-            self.uav_status[uav] = False
+            self.uav_status[uav] = True
             self.energy[uav] = 1.0
             self.load[uav] = 0.0
             self.packet_count[uav] = 0

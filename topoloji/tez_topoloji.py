@@ -38,6 +38,10 @@ def topology():
     c0.start()
     ap1.start([c0])
 
+    info("*** Mobilite baslatiliyor (FANET Gauss-Markov Modeli)\n")
+    net.setMobilityModel(time=0, model='GaussMarkov', max_x=100, max_y=100, min_v=5.0, max_v=15.0, seed=20)
+    net.stopMobility(time=30)
+
     info("*** CLI başlatılıyor\n")
     CLI(net)
 

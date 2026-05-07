@@ -2,7 +2,7 @@ import os
 from mininet.log import setLogLevel, info
 from mn_wifi.net import Mininet_wifi
 from mn_wifi.cli import CLI
-from mn_wifi.link import wmediumd
+from mn_wifi.link import wmediumd, adhoc
 from mn_wifi.wmediumdConnector import interference
 
 def topology():
@@ -18,12 +18,22 @@ def topology():
     ugv2 = net.addStation('ugv2', ip='10.0.0.4/8', position='40,35,0', range=35)
 
     net.setPropagationModel(model="logDistance", exp=3)
-    
+
     info("*** WiFi Düğümleri Yapılandırılıyor...\n")
     net.configureWifiNodes()
 
+    info("*** Ad-Hoc Ağı Kuruluyor...\n")
+    net.addLink(uav1, cls=adhoc, intf=uav1.wintfs[0], ssid='fanet-adhoc', mode='g', channel=5)
+    net.addLink(uav2, cls=adhoc, intf=uav2.wintfs[0], ssid='fanet-adhoc', mode='g', channel=5)
+    net.addLink(ugv1, cls=adhoc, intf=ugv1.wintfs[0], ssid='fanet-adhoc', mode='g', channel=5)
+    net.addLink(ugv2, cls=adhoc, intf=ugv2.wintfs[0], ssid='fanet-adhoc', mode='g', channel=5)
+
     info("*** Ağ Kuruluyor...\n")
     net.build()
+
+    info("*** Mobilite baslatiliyor (FANET Gauss-Markov Modeli)\n")
+    net.setMobilityModel(time=0, model='GaussMarkov', max_x=100, max_y=100, min_v=5.0, max_v=15.0, seed=20)
+    net.stopMobility(time=30)
 
     info("*** OLSR Dağıtık Yönlendirme Protokolü Başlatılıyor...\n")
     info("!!! DİKKAT: Sisteminizde 'olsrd' paketinin kurulu olması gerekmektedir.\n")
